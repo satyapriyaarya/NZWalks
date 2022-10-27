@@ -6,6 +6,6 @@
         public string Code { get; set; }
 
         //Navigation property
-         
+        public IEnumerable<Walk> Walks { get; set; }
     }
 }
