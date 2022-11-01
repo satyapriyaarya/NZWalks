@@ -10,11 +10,19 @@ namespace NZWalks.API.Controllers
     public class WalksController : Controller
     {
         private readonly IWalkRepository walkRepository;
+        private readonly IRegionRepository regionRepository;
+        private readonly IWalkDifficultyRepository walkDifficultyRepository;
         private readonly IMapper mapper;
 
-        public WalksController(IWalkRepository walkRepository, IMapper mapper)
+        public WalksController(
+            IWalkRepository walkRepository, 
+            IRegionRepository regionRepository,
+            IWalkDifficultyRepository walkDifficultyRepository,
+            IMapper mapper)
         {
             this.walkRepository = walkRepository;
+            this.regionRepository = regionRepository;
+            this.walkDifficultyRepository = walkDifficultyRepository;
             this.mapper = mapper;
         }
         [HttpGet]
@@ -42,6 +50,11 @@ namespace NZWalks.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody]AddWalkRequest request)
         {
+            var valid = await ValidateAdd(request);
+            if (!valid)
+            {
+                return BadRequest(ModelState);
+            }
             var walk = new Models.Domain.Walk()
             {
                 Name = request.Name,
@@ -85,6 +98,37 @@ namespace NZWalks.API.Controllers
             }
             var walkDTO = mapper.Map<Models.DTO.Walk>(walk);
             return Ok(walkDTO);
+        }
+
+        private async Task<bool> ValidateAdd(AddWalkRequest addWalkRequest)
+        {
+            if (string.IsNullOrEmpty(addWalkRequest.Name))
+            {
+                ModelState.AddModelError(nameof(addWalkRequest), "Name must not be null.");
+            }
+
+            if (addWalkRequest.Length < 0)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest), "Length can't be less than 0.");
+            }
+
+            var region = await regionRepository.Get(addWalkRequest.RegionId);
+            if(region == null)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest), "Region must exists.");
+            }
+
+            var wd = await walkDifficultyRepository.Get(addWalkRequest.WalkDifficultyId);
+            if (wd == null)
+            {
+                ModelState.AddModelError(nameof(addWalkRequest), "Walk difficulty must exists.");
+            }
+
+            if (ModelState.Count > 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

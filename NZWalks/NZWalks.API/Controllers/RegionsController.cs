@@ -43,8 +43,13 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpPost]
+        [ActionName("AddREGION")]
         public async Task<IActionResult> Add(AddRegionRequest addRegionRequest)
         {
+            if (!ValidateAdd(addRegionRequest))
+            {
+                return BadRequest(ModelState);
+            }
             var region = new Models.Domain.Region()
             {
                 Code = addRegionRequest.Code,
@@ -92,6 +97,27 @@ namespace NZWalks.API.Controllers
             }
             var regionDTO = mapper.Map<Models.DTO.Region>(region);
             return Ok(regionDTO);
+        }
+
+        private bool ValidateAdd(AddRegionRequest addRegionRequest)
+        {
+            if(addRegionRequest == null)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest), "region request must be not null");
+            }
+            if (string.IsNullOrEmpty(addRegionRequest.Code))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest), "region code must be not null");
+            }
+            if (string.IsNullOrEmpty(addRegionRequest.Name))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest), "name code must be not null");
+            }
+            if (ModelState.ErrorCount > 0)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
