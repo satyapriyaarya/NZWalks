@@ -50,11 +50,12 @@ namespace NZWalks.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody]AddWalkRequest request)
         {
-            var valid = await ValidateAdd(request);
-            if (!valid)
-            {
-                return BadRequest(ModelState);
-            }
+            ////Converted into fluent validator
+            //var valid = await ValidateAdd(request);
+            //if (!valid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
             var walk = new Models.Domain.Walk()
             {
                 Name = request.Name,

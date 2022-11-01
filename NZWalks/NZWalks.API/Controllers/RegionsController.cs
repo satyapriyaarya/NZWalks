@@ -46,10 +46,11 @@ namespace NZWalks.API.Controllers
         [ActionName("AddREGION")]
         public async Task<IActionResult> Add(AddRegionRequest addRegionRequest)
         {
-            if (!ValidateAdd(addRegionRequest))
-            {
-                return BadRequest(ModelState);
-            }
+            ////Converted into fluent validator
+            //if (!ValidateAdd(addRegionRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
             var region = new Models.Domain.Region()
             {
                 Code = addRegionRequest.Code,
