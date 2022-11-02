@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
@@ -8,7 +9,6 @@ namespace NZWalks.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-
     public class RegionsController : Controller
     {
         private readonly IRegionRepository regionRepository;
@@ -44,6 +44,7 @@ namespace NZWalks.API.Controllers
 
         [HttpPost]
         [ActionName("AddREGION")]
+        [Authorize]
         public async Task<IActionResult> Add(AddRegionRequest addRegionRequest)
         {
             ////Converted into fluent validator
@@ -67,6 +68,7 @@ namespace NZWalks.API.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid id)
         {
             var region = await regionRepository.Delete(id);
@@ -80,6 +82,7 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody]UpdateRegionRequest updateRegionRequest)
         {
             var region = new Models.Domain.Region()
